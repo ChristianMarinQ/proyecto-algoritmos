@@ -24,7 +24,7 @@ WORKDIR /app
 COPY Pipfile Pipfile.lock /app/
 
 # Instala las dependencias de pipenv
-RUN pipenv install --deploy --ignore-pipfile
+RUN pipenv install --skip-lock
 
 # Copia el resto del proyecto
 COPY . /app
