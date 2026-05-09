@@ -16,6 +16,9 @@ scipy = "*"
 matplotlib = "*"
 networkx = "*"
 wordcloud = "*"
+scikit-learn = "*"
+sentence-transformers = "*"
+Levenshtein = "*"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 
