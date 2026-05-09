@@ -21,9 +21,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 WORKDIR /app
 COPY Pipfile Pipfile.lock ./
 RUN pip install --no-cache-dir pipenv
-# Generar un archivo requirements plano e instalar sin la carga de pipenv
-RUN pipenv requirements > requirements.txt && \
-    pip install --no-cache-dir -r requirements.txt
+# Instalar directamente del Pipfile ignorando el lockfile viejo
+RUN pipenv install --system --skip-lock
 
 # --- Etapa 2: Imagen Final Ligera (Runtime) ---
 FROM python:3.9-slim
