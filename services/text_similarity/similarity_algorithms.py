@@ -40,12 +40,12 @@ except Exception as e:
     print(f"Error cargando SBERT: {e}")
 
 st_model2 = None
-# -- DESACTIVADO PARA AHORRAR MEMORIA EN RENDER FREE TIER --
-# try:
-#     from sentence_transformers import SentenceTransformer
-#     st_model2 = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-# except Exception as e:
-#     print(f"Error cargando SBERT multilingüe: {e}")
+try:
+    from sentence_transformers import SentenceTransformer
+    st_model2 = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+except Exception as e:
+    print(f"Error cargando SBERT multilingüe: {e}")
+
 
 # --- AUX FUNCTIONS ---
 def get_jaccard_sim(str1, str2):
