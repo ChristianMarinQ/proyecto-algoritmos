@@ -1,0 +1,214 @@
+"""
+  This module contains all the necesary methods for word counting and co-word visualization
+"""
+
+import os
+import json
+import re
+from collections import Counter
+from itertools import combinations
+
+import matplotlib.pyplot as plt
+import networkx as nx
+from wordcloud import WordCloud
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+def classify_term(term):
+    """Clasifica un término en General, Technical, Phrase o Educational."""
+    term = term.lower()
+    if ' ' in term:
+        return "Phrase"
+    technical_stems = ['genai', 'model', 'data', 'algorithm', 'system', 'llm', 'network', 'ai']
+    if any(stem in term for stem in technical_stems):
+        return "Technical"
+    educational_stems = ['learn', 'teach', 'student', 'school', 'university', 'curriculum', 'education']
+    if any(stem in term for stem in educational_stems):
+        return "Educational"
+    return "General"
+
+def discover_new_terms(articles, existing_keywords, max_terms=15):
+    """
+    Descubre nuevos términos asociados usando TF-IDF y clasifica su tipo.
+    """
+    abstracts = [art.get('abstract', '') for art in articles if art.get('abstract')]
+    if not abstracts:
+        return []
+        
+    vectorizer = TfidfVectorizer(stop_words='english', max_df=0.8, min_df=2, ngram_range=(1, 2))
+    try:
+        tfidf_matrix = vectorizer.fit_transform(abstracts)
+        
+        sum_tfidf = tfidf_matrix.sum(axis=0)
+        word_scores = [(word, sum_tfidf[0, idx]) for word, idx in vectorizer.vocabulary_.items()]
+        word_scores = sorted(word_scores, key=lambda x: x[1], reverse=True)
+        
+        existing_lower = set(k.lower() for k in existing_keywords)
+        
+        # Obtener frecuencias reales de los términos descubiertos
+        abstracts_all = " ".join(abstracts).lower()
+        
+        discovered = []
+        for word, score in word_scores:
+            word_l = word.lower()
+            if word_l not in existing_lower and not any(k.lower() in word_l for k in existing_lower):
+                # Calcular frecuencia real
+                pattern = r'\b' + re.escape(word_l) + r'\b'
+                freq = len(re.findall(pattern, abstracts_all))
+                
+                if freq == 0: continue # Evitar errores de regex
+
+                # Puntuación basada en TF-IDF (normalizada)
+                puntuacion = round(score, 3)
+                
+                discovered.append({
+                    "term": word.capitalize(),
+                    "puntuacion": puntuacion,
+                    "frequency": freq,
+                    "tipo": classify_term(word)
+                })
+                if len(discovered) == max_terms:
+                    break
+        return discovered
+    except Exception as e:
+        print(f"TF-IDF Error: {e}")
+        return []
+
+
+def execute_wordcounting(articles):
+    """
+    This method creates the required directory to store the generated graphs
+    """
+    results = {}
+    total_articles = len(articles)
+
+    project_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..'))
+
+    category_file = os.path.join(project_dir, "word_counting/category_variables.json")
+    synonym_map_file = os.path.join(project_dir, "word_counting/synonym_map.json")
+
+    project_dir_images = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../images'))
+    network_files_dir = os.path.join(project_dir_images, "co_word_network")
+    wordclouds_files_dir = os.path.join(project_dir_images, "word_cloud_network")
+    os.makedirs(network_files_dir, exist_ok=True)
+    os.makedirs(wordclouds_files_dir, exist_ok=True)
+    path_network = os.path.join(network_files_dir, "co_word_network.png")
+
+    with open(category_file, "r", encoding="utf-8") as f:
+        category_keywords = json.load(f)
+
+    with open(synonym_map_file, "r", encoding="utf-8") as f:
+        synonym_map = json.load(f)
+
+    category_freq, total_freq, article_occurrence = count_keywords_by_category(
+        articles, category_keywords, synonym_map
+    )
+
+    generate_wordclouds(category_freq, results, total_freq, output_dir=wordclouds_files_dir)
+
+    all_keywords = [kw for kws in category_keywords.values() for kw in kws]
+    generate_co_occurrence_network(articles, results, all_keywords, output_path=path_network)
+
+    # Preparar tabla 1: Frecuencias de categorías
+    freq_table = []
+    for term, count in total_freq.items():
+        occ = article_occurrence.get(term, 0)
+        percentage = round((occ / total_articles) * 100, 1) if total_articles > 0 else 0
+        freq_table.append({
+            "term": term,
+            "total_freq": count,
+            "articles_count": occ,
+            "percentage": percentage
+        })
+    
+    # Ordenar por frecuencia para que se vea igual a la imagen
+    freq_table = sorted(freq_table, key=lambda x: x['total_freq'], reverse=True)
+    results["frequencies"] = freq_table
+    
+    # Preparar tabla 2: Términos descubiertos
+    discovered = discover_new_terms(articles, all_keywords)
+    results["discovered_terms"] = discovered
+
+    return results
+
+
+def count_keywords_by_category(articles, category_keywords, synonym_map):
+    """
+    Cuenta frecuencias totales y cuántos artículos contienen cada palabra.
+    """
+    category_freq = {cat: Counter() for cat in category_keywords}
+    total_freq = Counter()
+    article_occurrence = Counter()
+
+    for article in articles:
+        abstract = article.get('abstract', '').lower()
+        if not abstract: continue
+
+        found_in_this_article = set()
+
+        for category, keywords in category_keywords.items():
+            for keyword in keywords:
+                main_keyword = synonym_map.get(keyword, keyword).lower()
+                pattern = r'\b' + re.escape(main_keyword) + r'\b'
+                count = len(re.findall(pattern, abstract))
+                if count > 0:
+                    category_freq[category][main_keyword] += count
+                    total_freq[main_keyword] += count
+                    found_in_this_article.add(main_keyword)
+        
+        for kw in found_in_this_article:
+            article_occurrence[kw] += 1
+
+    return category_freq, total_freq, article_occurrence
+
+
+def generate_wordclouds(category_freq, results, total_freq, output_dir="wordclouds"):
+    """
+    This method generates a word cloud for each category frequency
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    for category, freq in category_freq.items():
+        wc = WordCloud(width=800, height=400, background_color='white')
+        wc.generate_from_frequencies(freq)
+        file_path = os.path.join(
+            output_dir, f"{category.replace(' ', '_')}.png")
+        wc.to_file(file_path)
+        results[category.replace(' ', '_')] = file_path
+
+    wc = WordCloud(width=1000, height=500, background_color='white')
+    wc.generate_from_frequencies(total_freq)
+    file_path = os.path.join(
+        output_dir, "total.png")
+    wc.to_file(file_path)
+    results["total_cloud"] = file_path
+
+
+def generate_co_occurrence_network(articles, results, all_keywords,
+                                   output_path="word_counting/co_word_network.png"):
+    """
+    This method generares a co occurrence network graph with the keywords an the articles
+    """
+    g = nx.Graph()
+    for article in articles:
+        abstract = article.get("abstract", "").lower()
+        found_keywords = set()
+
+        for kw in all_keywords:
+            if re.search(r'\b' + re.escape(kw.lower()) + r'\b', abstract):
+                found_keywords.add(kw)
+
+        for a, b in combinations(found_keywords, 2):
+            if g.has_edge(a, b):
+                g[a][b]['weight'] += 1
+            else:
+                g.add_edge(a, b, weight=1)
+
+    plt.figure(figsize=(12, 12))
+    pos = nx.spring_layout(g, k=0.5)
+    nx.draw(g, pos, with_labels=True, node_size=500, node_color="skyblue",
+            edge_color="gray", font_size=10)
+    plt.title("Co-word Network")
+    plt.savefig(output_path)
+    plt.close()
+    results["co_word_network"] = output_path

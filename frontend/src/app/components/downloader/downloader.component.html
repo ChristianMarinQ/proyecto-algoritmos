@@ -1,0 +1,124 @@
+<div class="fade-in">
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Data Downloader</h1>
+    <p style="color: var(--text-muted);">Automatiza la búsqueda, extracción y unificación de artículos bibliográficos.</p>
+  </div>
+
+  <div class="glass-panel" style="padding: 2.5rem; max-width: 800px; margin: 0 auto;">
+
+    @if (statusMessage) {
+      <div class="status-box" [ngStyle]="{
+        'background': isError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+        'border': isError ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)',
+        'color': isError ? '#ef4444' : '#10b981'
+      }">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.2rem;">{{ isError ? 'Error' : 'Proceso Iniciado' }}</h3>
+        <p>{{ statusMessage }}</p>
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()" #downloadForm="ngForm" class="downloader-form">
+
+      <!-- Credenciales -->
+      <div class="responsive-grid-2">
+        <div>
+          <label class="form-label">Correo Electrónico (Institucional)</label>
+          <input type="email" [(ngModel)]="formData.email" name="email" required class="custom-input"
+            placeholder="ejemplo@uqvirtual.edu.co">
+        </div>
+        <div>
+          <label class="form-label">Contraseña</label>
+          <input type="password" [(ngModel)]="formData.password" name="password" required class="custom-input"
+            placeholder="••••••••">
+        </div>
+      </div>
+
+      <!-- Parámetros de Búsqueda -->
+      <div>
+        <label class="form-label">Palabra Clave o Término de Búsqueda</label>
+        <input type="text" [(ngModel)]="formData.query" name="query" required class="custom-input"
+          placeholder="Ej: generative artificial intelligence">
+      </div>
+
+      <div class="responsive-grid-2">
+        <div>
+          <label class="form-label">Cantidad Límite de Artículos</label>
+          <input type="number" [(ngModel)]="formData.limit" name="limit" required min="10" max="1000"
+            class="custom-input" placeholder="Ej: 100">
+        </div>
+        <div>
+          <label class="form-label">Base de Datos Objetivo</label>
+          <select [(ngModel)]="formData.database" name="database" required class="custom-select">
+            <option value="all">Todas (IEEE, ScienceDirect, Sage)</option>
+            <option value="science_direct">ScienceDirect (Scopus)</option>
+            <option value="ieee">IEEE Xplore</option>
+            <option value="sage">Sage Journals</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div style="margin-top: 1.5rem; text-align: center;">
+        <button type="submit" [disabled]="!downloadForm.form.valid || isLoading" class="btn-primary"
+          style="width: 100%; max-width: 320px; padding: 1rem; font-size: 1.05rem;">
+          @if (isLoading) {
+            Iniciando Extracción...
+          } @else {
+            🚀 Iniciar Descarga Automática
+          }
+        </button>
+        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+          * El proceso de scraping se ejecutará en segundo plano y abrirá un navegador automatizado.
+          No cierre la ventana de comandos.
+        </p>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<style>
+  .status-box {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+  }
+
+  .downloader-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .custom-input,
+  .custom-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .custom-input:focus,
+  .custom-select:focus {
+    border-color: var(--primary);
+  }
+
+  .custom-select option {
+    background: #0f172a;
+    color: #fff;
+  }
+</style>

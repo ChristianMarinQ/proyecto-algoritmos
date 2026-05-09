@@ -1,0 +1,146 @@
+<div class="fade-in">
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Word Counting & Networks</h1>
+    <p style="color: var(--text-muted);">Co-word networks and word clouds generated from abstracts.</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="glass-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px;">
+      <div class="spinner"></div>
+      <p style="margin-top: 1rem; color: var(--text-muted);">Analyzing text and extracting features...</p>
+    </div>
+  } @else if (data) {
+    <!-- Tablas Requerimiento 3 -->
+    <div style="display: flex; flex-direction: column; gap: 2.5rem; margin-bottom: 2.5rem;">
+      <!-- Tabla 1: Frecuencia de palabras requeridas -->
+      <div class="glass-panel" style="padding: 1.5rem;">
+        <h2 style="margin-bottom: 1rem; font-weight: 600; font-size: 1.5rem;">Frecuencia de las palabras:</h2>
+        <div style="overflow-x: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Palabra/Frase</th>
+                <th style="text-align: right;">Frecuencia Total</th>
+                <th style="text-align: right;">Artículos con Palabra</th>
+                <th style="text-align: right;">% de Artículos</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of data.frequencies; track item.term) {
+                <tr>
+                  <td style="color: #6ee7b7;">{{ item.term | titlecase }}</td>
+                  <td style="text-align: right;">{{ item.total_freq }}</td>
+                  <td style="text-align: right;">{{ item.articles_count }}</td>
+                  <td style="text-align: right; font-weight: 600;">{{ item.percentage }}%</td>
+                </tr>
+              }
+              @if (!data.frequencies || data.frequencies.length === 0) {
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin datos para mostrar</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tabla 2: Palabras relacionadas descubiertas -->
+      <div class="glass-panel" style="padding: 1.5rem;">
+        <h2 style="margin-bottom: 1rem; font-weight: 600; font-size: 1.5rem;">Palabras relacionadas:</h2>
+        <div style="overflow-x: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Palabra/Frase Descubierta</th>
+                <th style="text-align: right;">Puntuación</th>
+                <th style="text-align: right;">Frecuencia</th>
+                <th style="text-align: center;">Tipo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of data.discovered_terms; track item.term) {
+                <tr>
+                  <td style="color: #fca5a5;">{{ item.term }}</td>
+                  <td style="text-align: right; color: #fde047;">{{ item.puntuacion | number:'1.3-3' }}</td>
+                  <td style="text-align: right;">{{ item.frequency }}</td>
+                  <td style="text-align: center;">
+                    <span class="badge" [class.technical]="item.tipo === 'Technical'" [class.educational]="item.tipo === 'Educational'" [class.phrase]="item.tipo === 'Phrase'">
+                      {{ item.tipo }}
+                    </span>
+                  </td>
+                </tr>
+              }
+              @if (!data.discovered_terms || data.discovered_terms.length === 0) {
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin datos para mostrar</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Word Clouds -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+      @if (data.response) {
+        @for (item of data.response; track item.name) {
+          <div class="glass-panel image-card">
+            <h3>{{ item.name.replace('_', ' ').replace('.png', '') | titlecase }}</h3>
+            <img [src]="item.image" [alt]="item.name" />
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
+
+<style>
+  .image-card {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .image-card h3 {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 1rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .image-card img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+  }
+  .image-card img:hover {
+    transform: scale(1.02);
+  }
+  .badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.1);
+  }
+  .technical { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+  .educational { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+  .phrase { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text);
+  }
+  .data-table th {
+    background: rgba(15, 23, 42, 0.95);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.95rem;
+  }
+</style>

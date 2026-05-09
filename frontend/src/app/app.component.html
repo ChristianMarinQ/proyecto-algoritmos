@@ -1,0 +1,18 @@
+<!-- Hamburger Button (visible on mobile only) -->
+<button class="hamburger-btn" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+  {{ sidebarOpen ? '✕' : '☰' }}
+</button>
+
+<!-- Dark overlay (mobile) — closes sidebar on tap -->
+<div class="sidebar-overlay" [class.visible]="sidebarOpen" (click)="closeSidebar()"></div>
+
+<!-- App Layout -->
+<div class="app-layout">
+  <div class="app-sidebar" [class.open]="sidebarOpen">
+    <app-sidebar (closeSidebar)="closeSidebar()"></app-sidebar>
+  </div>
+
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

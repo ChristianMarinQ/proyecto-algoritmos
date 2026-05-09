@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+selenium = "*"
+pandas = "*"
+python-dotenv = "*"
+undetected-chromedriver = "*"
+bibtexparser = "*"
+pybtex = "*"
+tabulate = "*"
+nltk = "*"
+scipy = "*"
+matplotlib = "*"
+networkx = "*"
+wordcloud = "*"
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"

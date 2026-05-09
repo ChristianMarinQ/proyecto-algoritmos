@@ -1,0 +1,130 @@
+<aside class="glass-panel sidebar-container">
+  <!-- Close button: only visible on mobile -->
+  <button class="close-btn" (click)="close()" aria-label="Cerrar menú">✕</button>
+
+  <div class="logo-container">
+    <h2 class="logo-title">Bibliometry API</h2>
+    <p class="logo-subtitle">Stats Dashboard</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a routerLink="/downloader" routerLinkActive="active-link" class="nav-link" (click)="close()">
+      <span>⬇️</span> Data Downloader
+    </a>
+    <a routerLink="/filtering" routerLinkActive="active-link" class="nav-link" (click)="close()">
+      <span>📊</span> Filtering Results
+    </a>
+    <a routerLink="/statistics" routerLinkActive="active-link" class="nav-link" (click)="close()">
+      <span>🗺️</span> Visual Analysis (Req 5)
+    </a>
+    <a routerLink="/words" routerLinkActive="active-link" class="nav-link" (click)="close()">
+      <span>☁️</span> Word Counting
+    </a>
+    <a routerLink="/dendrograms" routerLinkActive="active-link" class="nav-link" (click)="close()">
+      <span>🌲</span> Dendrograms
+    </a>
+    <a routerLink="/similarity" routerLinkActive="active-link" class="nav-link" (click)="close()">
+      <span>🤖</span> Text Similarity
+    </a>
+  </nav>
+</aside>
+
+<style>
+  .sidebar-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    border-radius: 0;
+    border-top: none;
+    border-bottom: none;
+    border-left: none;
+    position: relative;
+    overflow-y: auto;
+  }
+
+  .close-btn {
+    display: none;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .close-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  .logo-container {
+    margin-bottom: 3rem;
+    text-align: center;
+    padding-top: 0.5rem;
+  }
+
+  .logo-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #a8b1ff, #4F46E5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    transform: translateX(4px);
+  }
+
+  .active-link {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.25), rgba(67, 56, 202, 0.2));
+    color: white;
+    border-left: 3px solid var(--primary);
+    padding-left: calc(1rem - 3px);
+  }
+
+  /* Show close button on mobile */
+  @media (max-width: 768px) {
+    .close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-container {
+      margin-top: 2.5rem;
+      margin-bottom: 2rem;
+    }
+  }
+</style>

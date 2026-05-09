@@ -1,0 +1,227 @@
+/* =========================================
+   GLOBAL STYLES — BibliometryStats Dashboard
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* --- Design Tokens --- */
+:root {
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --secondary: #7C3AED;
+  --accent: #38bdf8;
+  --bg-color: #0f172a;
+  --surface: rgba(30, 41, 59, 0.7);
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --sidebar-width: 280px;
+  --header-height: 60px;
+}
+
+/* --- Reset --- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* --- Body --- */
+body {
+  background-color: var(--bg-color);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* --- Glass Panel --- */
+.glass-panel {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Buttons --- */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- Spinner --- */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--surface);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Fade In --- */
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Hamburger Button (mobile only) --- */
+.hamburger-btn {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: background 0.2s;
+}
+.hamburger-btn:hover {
+  background: rgba(79, 70, 229, 0.2);
+}
+
+/* --- Sidebar Overlay (mobile) --- */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.visible {
+  display: block;
+}
+
+/* --- App Layout --- */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.app-main {
+  flex: 1;
+  padding: 2rem;
+  min-width: 0; /* prevents flex children from overflowing */
+  overflow-x: hidden;
+}
+
+/* --- Responsive Utility Classes --- */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* =========================================
+   MOBILE BREAKPOINTS  ≤ 768px
+   ========================================= */
+@media (max-width: 768px) {
+  /* Show hamburger */
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Sidebar: slide off-screen by default */
+  .app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    z-index: 150;
+  }
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Main content takes full width, add top padding for hamburger */
+  .app-main {
+    padding: 4.5rem 1rem 1.5rem;
+    width: 100%;
+  }
+
+  /* Headings scale down */
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.35rem !important; }
+
+  /* Stack 2-column grids vertically */
+  .responsive-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stats grid */
+  [style*="minmax(450px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Remove grid-column: span 2 on mobile */
+  [style*="grid-column: span 2"],
+  [style*="grid-column:span 2"] {
+    grid-column: span 1 !important;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE  ≤ 480px
+   ========================================= */
+@media (max-width: 480px) {
+  .app-main {
+    padding: 4.5rem 0.75rem 1rem;
+  }
+
+  .glass-panel {
+    border-radius: 12px;
+  }
+
+  .btn-primary {
+    font-size: 0.9rem;
+    padding: 0.65rem 1.25rem;
+  }
+}

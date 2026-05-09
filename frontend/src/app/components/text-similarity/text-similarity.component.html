@@ -1,0 +1,144 @@
+<div class="fade-in">
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Similitud Textual y Semántica</h1>
+    <p style="color: var(--text-muted);">Compara dos o más artículos utilizando algoritmos clásicos y modelos de Inteligencia Artificial.</p>
+  </div>
+
+  <div class="glass-panel" style="margin-bottom: 2rem; padding: 2rem;">
+    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+      @for (sel of selectedArticles; track $index) {
+        <div style="display: flex; gap: 1rem; align-items: flex-end;">
+          <div style="flex-grow: 1;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Artículo {{ $index + 1 }}</label>
+            <select [(ngModel)]="selectedArticles[$index]" class="custom-select">
+              <option value="" disabled selected>Selecciona un artículo...</option>
+              @for (art of articles; track art.id) {
+                <option [value]="art.id">{{ art.title }}</option>
+              }
+            </select>
+          </div>
+          @if (selectedArticles.length > 2) {
+            <button (click)="removeArticle($index)" class="btn-primary" style="background: #ef4444; padding: 0.75rem 1rem;">
+              ✕
+            </button>
+          }
+        </div>
+      }
+      
+      <div style="text-align: right; margin-top: 0.5rem;">
+        <button (click)="addArticle()" style="background: transparent; border: 1px dashed var(--primary); color: var(--primary); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">
+          + Añadir otro artículo
+        </button>
+      </div>
+    </div>
+
+    @if (errorMsg) {
+      <div style="color: #ef4444; margin-bottom: 1rem; text-align: center;">{{ errorMsg }}</div>
+    }
+
+    <div style="text-align: center;">
+      <button (click)="compare()" [disabled]="isLoading" class="btn-primary">
+        @if (isLoading) {
+          Comparando... (Analizando semántica profunda)
+        } @else {
+          Analizar Similitud
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (results) {
+    <div class="fade-in">
+      <h2 style="margin-bottom: 1.5rem;">Resultados de Comparación</h2>
+      
+      <div style="margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary);">
+        <p style="color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">Artículos Evaluados:</p>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          @for (title of results.articles; track $index) {
+            <li style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.1rem;">
+              <span style="color: var(--text-muted); margin-right: 0.5rem; font-weight: bold;">{{ $index + 1 }}.</span> {{ title }}
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- CARDS ORIGINALES (REQUISITO PRINCIPAL) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+        @for (res of results.results; track res.name) {
+          <div class="glass-panel result-card" [class.ai-card]="res.type.includes('IA')">
+            <div class="card-header">
+              <h3>{{ res.name }}</h3>
+              <span class="badge" [class.ai-badge]="res.type.includes('IA')">{{ res.type }}</span>
+            </div>
+            
+            <div class="score-container">
+              <div class="score-circle">
+                <span>{{ res.score | number:'1.0-1' }}%</span>
+              </div>
+            </div>
+
+            <div class="explanation">
+              <strong>¿Qué se evalúa?</strong>
+              <p>{{ res.explanation }}</p>
+              
+              <div class="formula-box">
+                <strong style="color: var(--primary);">Fórmula Matemática</strong>
+                <div class="math-formula">
+                  {{ res.formula }}
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 3rem;">
+
+      <!-- COMPLEMENTO: MÉTRICAS Y GRÁFICAS -->
+      <h2 style="margin-bottom: 1.5rem;">Métricas de Rendimiento y Complejidad (Complemento)</h2>
+      
+      <div class="glass-panel" style="margin-bottom: 2.5rem; padding: 1.5rem; overflow-x: auto;">
+        <h3 style="margin-bottom: 1.5rem; color: var(--primary); font-size: 1.25rem;">Análisis Algorítmico</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Algoritmo</th>
+              <th style="text-align: center;">Tipo</th>
+              <th style="text-align: center;">Complejidad</th>
+              <th style="text-align: right;">Tiempo Promedio</th>
+              <th style="text-align: right;">Similitud</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (res of results.results; track res.name) {
+              <tr>
+                <td><strong>{{ res.name }}</strong></td>
+                <td style="text-align: center;">{{ res.type }}</td>
+                <td style="text-align: center;">
+                  <span class="complexity-badge">{{ res.complexity }}</span>
+                </td>
+                <td style="text-align: right; color: var(--accent); font-weight: 500;">{{ res.execution_time | number:'1.2-4' }} ms</td>
+                <td style="text-align: right; font-weight: 700; color: var(--primary);">{{ res.score }}%</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+        @if (results.visualizations.performance_chart) {
+          <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Comparativa de Tiempos (ms)</h3>
+            <img [src]="results.visualizations.performance_chart" style="width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);" alt="Gráfica de Rendimiento">
+          </div>
+        }
+        @if (results.visualizations.ranking_chart) {
+          <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Ranking Eficiencia vs Semántica</h3>
+            <img [src]="results.visualizations.ranking_chart" style="width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);" alt="Ranking de Algoritmos">
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

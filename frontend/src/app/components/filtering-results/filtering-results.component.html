@@ -1,0 +1,73 @@
+<div class="fade-in">
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Filtering Results</h1>
+    <p style="color: var(--text-muted);">Overview of the processed bibliometric data.</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="glass-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px;">
+      <div class="spinner"></div>
+      <p style="margin-top: 1rem; color: var(--text-muted);">Processing and filtering data...</p>
+    </div>
+  } @else if (data) {
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+      <div class="glass-panel card">
+        <h3>📄 Articles</h3>
+        <p class="metric">{{ data.articles.split(' ')[0] }}</p>
+        <span class="label">Total Found</span>
+      </div>
+      <div class="glass-panel card">
+        <h3>📚 Journals</h3>
+        <p class="metric">{{ data.journals.split(' ')[0] }}</p>
+        <span class="label">Total Found</span>
+      </div>
+      <div class="glass-panel card">
+        <h3>🔑 Keywords</h3>
+        <p class="metric">{{ data.keywords.split(' ')[0] }}</p>
+        <span class="label">Total Found</span>
+      </div>
+      <div class="glass-panel card">
+        <h3>✍️ Authors</h3>
+        <p class="metric">{{ data.authors.split(' ')[0] }}</p>
+        <span class="label">Total Found</span>
+      </div>
+      <div class="glass-panel card">
+        <h3>🔄 Repeated</h3>
+        <p class="metric" style="color: #ef4444;">{{ data.reapeated.split(' ')[0] }}</p>
+        <span class="label">Duplicates Filtered</span>
+      </div>
+    </div>
+  }
+</div>
+
+<style>
+  .card {
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  .card h3 {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .metric {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: linear-gradient(135deg, #a8b1ff, var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+  .label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+</style>

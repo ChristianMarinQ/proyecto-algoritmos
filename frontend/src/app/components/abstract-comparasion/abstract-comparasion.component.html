@@ -1,0 +1,105 @@
+<div class="fade-in">
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Abstracts Comparison</h1>
+    <p style="color: var(--text-muted);">Dendrograms showing hierarchical clustering of abstracts.</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="glass-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px;">
+      <div class="spinner"></div>
+      <p style="margin-top: 1rem; color: var(--text-muted);">Vectorizando texto y generando dendrogramas...</p>
+    </div>
+  } @else if (data) {
+    <!-- Análisis de Coherencia -->
+    <div class="glass-panel" style="margin-bottom: 2rem; padding: 1.5rem;">
+      <h2 style="margin-bottom: 1rem; font-size: 1.5rem;">Análisis de Coherencia</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">El <b>Coeficiente de Correlación Cofenética</b> mide qué tan fielmente el dendrograma preserva las distancias originales entre los abstracts.</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div class="metric-card" [class.best]="data.metrics.best_algorithm === 'ward'">
+          <span class="metric-label">Ward</span>
+          <span class="metric-value">{{ data.metrics.ward }}</span>
+        </div>
+        <div class="metric-card" [class.best]="data.metrics.best_algorithm === 'average'">
+          <span class="metric-label">Average</span>
+          <span class="metric-value">{{ data.metrics.average }}</span>
+        </div>
+        <div class="metric-card" [class.best]="data.metrics.best_algorithm === 'complete'">
+          <span class="metric-label">Complete</span>
+          <span class="metric-value">{{ data.metrics.complete }}</span>
+        </div>
+      </div>
+      
+      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(99, 102, 241, 0.1); border-radius: 8px; border-left: 4px solid var(--primary);">
+        <p><b>Conclusión:</b> El algoritmo <b>{{ data.metrics.best_algorithm | titlecase }}</b> es el más coherente para este conjunto de datos, ya que posee el coeficiente más cercano a 1.</p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+      <div class="glass-panel image-card">
+        <h3>Dendrograma: Ward Linkage</h3>
+        <img [src]="data.ward" alt="Ward Dendrogram" />
+      </div>
+      <div class="glass-panel image-card">
+        <h3>Dendrograma: Average Linkage</h3>
+        <img [src]="data.average" alt="Average Dendrogram" />
+      </div>
+      <div class="glass-panel image-card">
+        <h3>Dendrograma: Complete Linkage</h3>
+        <img [src]="data.complete" alt="Complete Dendrogram" />
+      </div>
+    </div>
+  }
+</div>
+
+<style>
+  .metric-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+  .metric-card.best {
+    border-color: var(--primary);
+    background: rgba(79, 70, 229, 0.1);
+    box-shadow: 0 0 15px rgba(79, 70, 229, 0.2);
+  }
+  .metric-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .image-card {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .image-card h3 {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 1rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .image-card img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+  }
+  .image-card img:hover {
+    transform: scale(1.01);
+  }
+</style>
