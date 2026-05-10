@@ -11,6 +11,10 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libxslt1-dev \
     libz-dev \
+    gdal-bin \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Crear un entorno virtual aislado
@@ -43,6 +47,10 @@ RUN apt-get update && apt-get install -y \
     libxrandr2 \
     libgbm1 \
     libasound2 \
+    gdal-bin \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Copiar el entorno virtual ya compilado de la Etapa 1
