@@ -1,14 +1,15 @@
 [build]
+  base    = "frontend"
   command = "ng build --configuration production"
   publish = "dist/frontend/browser"
 
 [[redirects]]
-  from = "/api/*"
-  to = "http://203.161.39.226/:splat"
+  from   = "/api/*"
+  to     = "http://203.161.39.226/:splat"
   status = 200
-  force = true
+  force  = true
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from   = "/*"
+  to     = "/index.html"
   status = 200
