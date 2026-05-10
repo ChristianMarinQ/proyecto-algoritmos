@@ -26,7 +26,7 @@ def get_articles_list():
                 })
         return response
     except Exception as e:
-        return HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/compare")
 def compare_articles(request: SimilarityRequest):
@@ -65,4 +65,4 @@ def compare_articles(request: SimilarityRequest):
         
         return response
     except Exception as e:
-        return HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
