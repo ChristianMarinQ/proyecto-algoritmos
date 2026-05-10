@@ -9,31 +9,39 @@ def generate_geographical_heatmap(articles, output_path):
     """
     Genera un mapa de calor basado en la mención de países en abstracts y títulos.
     """
+    has_geopandas = True
     try:
         import geopandas as gpd
-        import pycountry
     except ImportError:
-        print("Advertencia: No se encontró 'geopandas' o 'pycountry'. El mapa geográfico se omitirá.")
-        return None, {}
+        print("Advertencia: No se encontró 'geopandas'. Se usará el gráfico de barras por defecto.")
+        has_geopandas = False
+        world = None
+
+    try:
+        import pycountry
+        countries = [c.name for c in pycountry.countries]
+    except ImportError:
+        print("Advertencia: No se encontró 'pycountry'. Se usarán nombres básicos.")
+        countries = ["United States", "China", "United Kingdom", "Colombia", "Mexico", "Spain", "Germany", "Japan", "Brazil", "India", "Australia"]
 
     # Intentar cargar mapa del mundo
-    try:
-        # En versiones nuevas de geopandas, datasets.get_path ya no existe
-        url = "https://raw.githubusercontent.com/holtzy/The-Python-Graph-Gallery/master/static/data/world.geojson"
-        world = gpd.read_file(url)
-    except Exception:
+    if has_geopandas:
         try:
-             # Segundo intento con otra fuente
-             url = "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
-             world = gpd.read_file(url)
-             if 'name' not in world.columns and 'NAME' in world.columns:
-                 world['name'] = world['NAME']
-        except Exception as e:
-            print(f"Error cargando el mapa: {e}")
-            world = None
+            # En versiones nuevas de geopandas, datasets.get_path ya no existe
+            url = "https://raw.githubusercontent.com/holtzy/The-Python-Graph-Gallery/master/static/data/world.geojson"
+            world = gpd.read_file(url)
+        except Exception:
+            try:
+                 # Segundo intento con otra fuente
+                 url = "https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json"
+                 world = gpd.read_file(url)
+                 if 'name' not in world.columns and 'NAME' in world.columns:
+                     world['name'] = world['NAME']
+            except Exception as e:
+                print(f"Error cargando el mapa: {e}")
+                world = None
 
     country_counts = {}
-    countries = [c.name for c in pycountry.countries]
     
     # Mapeo extendido: Universidades, Ciudades y Alias a Países Oficiales
     alias_map = {
