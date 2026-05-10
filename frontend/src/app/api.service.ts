@@ -12,19 +12,19 @@ export class ApiService {
   constructor(private http: HttpClient) { }
 
   getStatistics(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/articlesStatistics`);
+    return this.http.get(`${this.baseUrl}/articlesStatistics/`);
   }
 
   getWordCounting(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/wordCounting`);
+    return this.http.get(`${this.baseUrl}/wordCounting/`);
   }
 
   getAbstractsComparison(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/abstractComparasion`);
+    return this.http.get(`${this.baseUrl}/abstractComparasion/`);
   }
 
   getFilteringResults(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/filteringResults`);
+    return this.http.get(`${this.baseUrl}/filteringResults/`);
   }
 
   getArticlesList(): Observable<any> {
