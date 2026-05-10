@@ -5,5 +5,5 @@ export const environment = {
   // Change this to your actual server IP or domain before building for production:
   // e.g. apiUrl: 'http://192.168.1.100:8000'  (LAN)
   // e.g. apiUrl: 'https://mi-dominio.com/api'  (Internet)
-  apiUrl: 'http://localhost:8000'
+  apiUrl: '/api'
 };
