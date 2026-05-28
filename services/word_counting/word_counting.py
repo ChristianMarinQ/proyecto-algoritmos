@@ -57,17 +57,22 @@ def discover_new_terms(articles, existing_keywords, max_terms=15):
                 
                 if freq == 0: continue # Evitar errores de regex
 
-                # Puntuación basada en TF-IDF (normalizada)
-                puntuacion = round(score, 3)
-                
                 discovered.append({
                     "term": word.capitalize(),
-                    "puntuacion": puntuacion,
+                    "puntuacion": float(score),
                     "frequency": freq,
                     "tipo": classify_term(word)
                 })
                 if len(discovered) == max_terms:
                     break
+
+        # Normalizar puntuaciones a rango 0-1 (el mayor queda en 1.000)
+        if discovered:
+            max_score = max(item["puntuacion"] for item in discovered)
+            if max_score > 0:
+                for item in discovered:
+                    item["puntuacion"] = round(item["puntuacion"] / max_score, 3)
+
         return discovered
     except Exception as e:
         print(f"TF-IDF Error: {e}")

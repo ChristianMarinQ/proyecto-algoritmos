@@ -128,20 +128,44 @@ class ReaderImplementation:
                 article['abstract'] = abstract_text
 
             # Prevents a duplicated article
-            if self.verify_article_exists(article['title']):
+            if self.verify_article_exists(article['title'], article.get('abstract', '')):
                 self.repeated_articles.append(article)
             else:
                 self.articles.append(article)
         except (KeyError, ValueError, IOError) as e:
             print(f"An article was not processed due to error: {e}")
 
-    def verify_article_exists(self, title):
+    def verify_article_exists(self, title, abstract=""):
         """
         Verifies if an article exists in the list of articles
+        using a normalized title and optionally the first 15 words of the abstract.
         """
+        # Normalizar el título actual
+        title_clean = "".join(char for char in title.lower() if char.isalnum())
+        
+        # Limpiar y extraer las primeras 15 palabras del abstract
+        abstract_clean = abstract.strip() if abstract else ""
+        words = [w for w in abstract_clean.lower().split() if w.isalnum()]
+        abstract_prefix = " ".join(words[:15])
+
         for article in self.articles:
-            if article['title'] == title:
-                return True
+            # Normalizar el título del artículo ya existente
+            existing_title_clean = "".join(char for char in article['title'].lower() if char.isalnum())
+            
+            if existing_title_clean == title_clean:
+                existing_abstract = article.get('abstract', '').strip()
+                
+                # Si ambos tienen abstracts no vacíos, comparamos las primeras 15 palabras
+                if abstract_prefix and existing_abstract:
+                    existing_words = [w for w in existing_abstract.lower().split() if w.isalnum()]
+                    existing_prefix = " ".join(existing_words[:15])
+                    
+                    if existing_prefix == abstract_prefix:
+                        return True
+                else:
+                    # Si no hay abstract, confiamos en el título normalizado
+                    return True
+        return False
 
     def inject_keywords(self, keywords):
         """
